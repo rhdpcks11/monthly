@@ -26,26 +26,20 @@ ${rawText}
 위 내용을 분석하여 아래 JSON 형식으로 정확히 반환해주세요. JSON만 반환하고 다른 텍스트는 포함하지 마세요.
 
 {
-  "student_feedback": "학생 자기 피드백 (학생 본인의 목소리로, 1인칭, 3~5문장)",
-  "mentor_feedback": "멘토 피드백 (관찰자 시점, 학생의 성장과 노력을 구체적으로 언급, 3~5문장)",
+  "student_feedback": "학생 자기 피드백 (학생 본인의 목소리, 1인칭, 3~5문장)",
+  "mentor_summary": "월간 멘토 총평 (관찰자 시점, 이번 달 전반적 성과·태도 평가 + 앞으로의 기대, 5~7문장)",
   "directions": ["다음 달 코칭 방향 1", "코칭 방향 2", "코칭 방향 3"],
-  "parent_message": "학부모 메시지 (학부모님께 전하는 따뜻한 2~3문장)",
-  "summary_p1": "월간 총평 첫 문단 (이번 달 전반적 성과와 태도 평가, 3~4문장)",
-  "summary_p2": "월간 총평 둘째 문단 (앞으로의 기대와 응원 메시지, 3~4문장)"
+  "parent_message": "학부모 메시지 (학부모님께 전하는 따뜻한 2~3문장)"
 }`;
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 2048,
-      messages: [
-        { role: "user", content: userPrompt },
-      ],
+      messages: [{ role: "user", content: userPrompt }],
       system: systemPrompt,
     });
 
     const text = message.content[0].type === "text" ? message.content[0].text : "";
-
-    // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return NextResponse.json({ error: "Failed to parse response" }, { status: 500 });

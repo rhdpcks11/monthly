@@ -21,11 +21,9 @@ const defaultInput: ReportInput = {
   totalDays: 30,
   weeklyRates: [0, 0, 0, 0],
   studentFeedback: "",
-  mentorFeedback: "",
+  mentorSummary: "",
   directions: "",
   parentMessage: "",
-  summaryP1: "",
-  summaryP2: "",
   rawText: "",
 };
 
@@ -35,7 +33,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 직접 입력한 내용으로 미리보기
   const handlePreview = () => {
     const directions = input.directions
       .split("\n")
@@ -56,42 +53,32 @@ export default function Home() {
       totalDays: input.totalDays,
       weeklyRates: input.weeklyRates,
       studentFeedback: input.studentFeedback,
-      mentorFeedback: input.mentorFeedback,
+      mentorSummary: input.mentorSummary,
       directions,
       parentMessage: input.parentMessage,
-      summaryP1: input.summaryP1,
-      summaryP2: input.summaryP2,
     });
   };
 
-  // AI로 텍스트 자동 생성
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
       });
-
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || "AI 생성에 실패했습니다.");
       }
-
       const generated: GeneratedContent = await res.json();
-
-      // AI 결과를 입력 필드에 채워넣기
       setInput((prev) => ({
         ...prev,
         studentFeedback: generated.student_feedback,
-        mentorFeedback: generated.mentor_feedback,
+        mentorSummary: generated.mentor_summary,
         directions: generated.directions.join("\n"),
         parentMessage: generated.parent_message,
-        summaryP1: generated.summary_p1,
-        summaryP2: generated.summary_p2,
       }));
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "알 수 없는 오류";
@@ -103,7 +90,6 @@ export default function Home() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* 왼쪽 입력 패널 */}
       <div className="w-[420px] min-w-[420px] flex-shrink-0 relative">
         <InputPanel
           data={input}
@@ -118,8 +104,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      {/* 오른쪽 레포트 미리보기 */}
       <div className="flex-1 overflow-hidden">
         <ReportPreview data={report} />
       </div>

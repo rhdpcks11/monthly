@@ -54,60 +54,30 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
 
       {/* 기본 정보 */}
       <section className="mb-5">
-        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">
-          기본 정보
-        </h2>
+        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">기본 정보</h2>
         <div className="space-y-3">
           <div>
             <label className={labelClass}>학생 이름</label>
-            <input
-              className={inputClass}
-              value={data.studentName}
-              onChange={(e) => update("studentName", e.target.value)}
-              placeholder="홍길동"
-            />
+            <input className={inputClass} value={data.studentName} onChange={(e) => update("studentName", e.target.value)} placeholder="홍길동" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>연도</label>
-              <input
-                type="number"
-                className={inputClass}
-                value={data.year}
-                onChange={(e) => update("year", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} value={data.year} onChange={(e) => update("year", Number(e.target.value))} />
             </div>
             <div>
               <label className={labelClass}>월</label>
-              <input
-                type="number"
-                className={inputClass}
-                min={1}
-                max={12}
-                value={data.month}
-                onChange={(e) => update("month", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} min={1} max={12} value={data.month} onChange={(e) => update("month", Number(e.target.value))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>코칭 개월차</label>
-              <input
-                type="number"
-                className={inputClass}
-                min={1}
-                value={data.coachingMonth}
-                onChange={(e) => update("coachingMonth", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} min={1} value={data.coachingMonth} onChange={(e) => update("coachingMonth", Number(e.target.value))} />
             </div>
             <div>
               <label className={labelClass}>담당 멘토</label>
-              <input
-                className={inputClass}
-                value={data.mentorName}
-                onChange={(e) => update("mentorName", e.target.value)}
-                placeholder="김멘토"
-              />
+              <input className={inputClass} value={data.mentorName} onChange={(e) => update("mentorName", e.target.value)} placeholder="김멘토" />
             </div>
           </div>
         </div>
@@ -115,76 +85,36 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
 
       {/* 이달의 수치 */}
       <section className="mb-5">
-        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">
-          이달의 수치
-        </h2>
+        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">이달의 수치</h2>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>과제 완료율 (%)</label>
-              <input
-                type="number"
-                className={inputClass}
-                min={0}
-                max={100}
-                value={data.taskCompletionRate}
-                onChange={(e) => update("taskCompletionRate", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} min={0} max={100} value={data.taskCompletionRate} onChange={(e) => update("taskCompletionRate", Number(e.target.value))} />
             </div>
             <div>
               <label className={labelClass}>지난달 대비 (%p)</label>
-              <input
-                type="number"
-                className={inputClass}
-                value={data.taskCompletionDelta}
-                onChange={(e) => update("taskCompletionDelta", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} value={data.taskCompletionDelta} onChange={(e) => update("taskCompletionDelta", Number(e.target.value))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>총 학습시간 (h)</label>
-              <input
-                type="number"
-                className={inputClass}
-                min={0}
-                step={0.1}
-                value={data.totalStudyHours}
-                onChange={(e) => update("totalStudyHours", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} min={0} step={0.1} value={data.totalStudyHours} onChange={(e) => update("totalStudyHours", Number(e.target.value))} />
             </div>
             <div>
               <label className={labelClass}>일 평균 (h)</label>
-              <input
-                type="number"
-                className={inputClass}
-                min={0}
-                step={0.1}
-                value={data.dailyAvgHours}
-                onChange={(e) => update("dailyAvgHours", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} min={0} step={0.1} value={data.dailyAvgHours} onChange={(e) => update("dailyAvgHours", Number(e.target.value))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>기상 인증 (일)</label>
-              <input
-                type="number"
-                className={inputClass}
-                min={0}
-                value={data.wakeUpDays}
-                onChange={(e) => update("wakeUpDays", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} min={0} value={data.wakeUpDays} onChange={(e) => update("wakeUpDays", Number(e.target.value))} />
             </div>
             <div>
               <label className={labelClass}>총 일수</label>
-              <input
-                type="number"
-                className={inputClass}
-                min={1}
-                value={data.totalDays}
-                onChange={(e) => update("totalDays", Number(e.target.value))}
-              />
+              <input type="number" className={inputClass} min={1} value={data.totalDays} onChange={(e) => update("totalDays", Number(e.target.value))} />
             </div>
           </div>
         </div>
@@ -192,121 +122,39 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
 
       {/* 주차별 과제 완료율 */}
       <section className="mb-5">
-        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">
-          주차별 과제 완료율
-        </h2>
+        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">주차별 과제 완료율</h2>
         <div className="space-y-2">
           {[0, 1, 2, 3].map((i) => (
             <div key={i} className="flex items-center gap-3">
-              <label className="text-xs font-semibold text-gray-600 w-12">
-                {i + 1}주차
-              </label>
-              <input
-                type="number"
-                className={inputClass}
-                min={0}
-                max={100}
-                value={data.weeklyRates[i]}
-                onChange={(e) => updateWeekly(i, Number(e.target.value))}
-              />
+              <label className="text-xs font-semibold text-gray-600 w-12">{i + 1}주차</label>
+              <input type="number" className={inputClass} min={0} max={100} value={data.weeklyRates[i]} onChange={(e) => updateWeekly(i, Number(e.target.value))} />
               <span className="text-xs text-gray-400">%</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 레포트 내용 직접 입력 */}
+      {/* 코칭 원문 + AI 자동생성 */}
       <section className="mb-5">
-        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">
-          레포트 내용
-        </h2>
-        <div className="space-y-3">
-          <div>
-            <label className={labelClass}>학생 자기 피드백</label>
-            <textarea
-              className={textareaClass}
-              rows={3}
-              value={data.studentFeedback}
-              onChange={(e) => update("studentFeedback", e.target.value)}
-              placeholder="학생 본인의 목소리로 이번 달 소감을 작성해주세요."
-            />
-          </div>
-          <div>
-            <label className={labelClass}>멘토 피드백</label>
-            <textarea
-              className={textareaClass}
-              rows={3}
-              value={data.mentorFeedback}
-              onChange={(e) => update("mentorFeedback", e.target.value)}
-              placeholder="멘토의 관찰자 시점에서 학생 성장과 노력을 작성해주세요."
-            />
-          </div>
-          <div>
-            <label className={labelClass}>월간 총평 (첫째 문단)</label>
-            <textarea
-              className={textareaClass}
-              rows={3}
-              value={data.summaryP1}
-              onChange={(e) => update("summaryP1", e.target.value)}
-              placeholder="이번 달 전반적 성과와 태도 평가"
-            />
-          </div>
-          <div>
-            <label className={labelClass}>월간 총평 (둘째 문단)</label>
-            <textarea
-              className={textareaClass}
-              rows={3}
-              value={data.summaryP2}
-              onChange={(e) => update("summaryP2", e.target.value)}
-              placeholder="앞으로의 기대와 응원 메시지"
-            />
-          </div>
-          <div>
-            <label className={labelClass}>다음 달 코칭 방향 (줄바꿈으로 구분)</label>
-            <textarea
-              className={textareaClass}
-              rows={3}
-              value={data.directions}
-              onChange={(e) => update("directions", e.target.value)}
-              placeholder={"영어 독해 집중 훈련\n오답노트 습관화\n주 3회 자습 시간 확보"}
-            />
-          </div>
-          <div>
-            <label className={labelClass}>학부모 메시지</label>
-            <textarea
-              className={textareaClass}
-              rows={2}
-              value={data.parentMessage}
-              onChange={(e) => update("parentMessage", e.target.value)}
-              placeholder="학부모님께 전하는 따뜻한 메시지"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* AI 자동생성 (선택) */}
-      <section className="mb-5">
-        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">
-          AI 자동생성 (선택)
-        </h2>
+        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">AI 자동생성</h2>
         <p className="text-xs text-gray-400 mb-2">
-          원문 텍스트를 붙여넣고 버튼을 누르면 위 레포트 내용이 자동으로 채워집니다.
+          학생 피드백, 멘토 메모, 코칭 방향, 학부모 전달 사항 등을 형식 없이 자유롭게 붙여넣으면 아래 4개 항목이 자동으로 채워집니다.
         </p>
         <textarea
           className={textareaClass}
-          rows={6}
+          rows={8}
           value={data.rawText}
           onChange={(e) => update("rawText", e.target.value)}
-          placeholder="학생 피드백, 멘토 메모, 코칭 방향 등을 자유롭게 붙여넣으세요..."
+          placeholder={`예시:\n학생이 이번 달 수학 모의고사 성적이 15점 올랐고, 아침 기상 루틴도 잘 지켰음. 영어 독해는 아직 약한 편. 학부모님이 아이의 변화에 만족하고 계심. 다음 달에는 영어에 집중하기로 함...`}
         />
         <button
           onClick={onGenerate}
           disabled={loading || !data.rawText.trim()}
-          className="w-full mt-2 py-2 rounded-lg text-white font-semibold text-xs transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-gray-600 hover:bg-gray-700 active:scale-[0.98]"
+          className="w-full mt-2 py-2.5 rounded-lg text-white font-semibold text-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-gray-700 hover:bg-gray-800 active:scale-[0.98]"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
@@ -316,6 +164,29 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
             "AI로 내용 자동 채우기"
           )}
         </button>
+      </section>
+
+      {/* 레포트 내용 직접 입력/수정 */}
+      <section className="mb-5">
+        <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">레포트 내용 (직접 수정 가능)</h2>
+        <div className="space-y-3">
+          <div>
+            <label className={labelClass}>학생 자기 피드백</label>
+            <textarea className={textareaClass} rows={3} value={data.studentFeedback} onChange={(e) => update("studentFeedback", e.target.value)} placeholder="학생 본인의 목소리로 이번 달 소감" />
+          </div>
+          <div>
+            <label className={labelClass}>월간 멘토 총평</label>
+            <textarea className={textareaClass} rows={4} value={data.mentorSummary} onChange={(e) => update("mentorSummary", e.target.value)} placeholder="멘토의 관찰 및 전반적 평가" />
+          </div>
+          <div>
+            <label className={labelClass}>다음 달 코칭 방향 (줄바꿈으로 구분)</label>
+            <textarea className={textareaClass} rows={3} value={data.directions} onChange={(e) => update("directions", e.target.value)} placeholder={"영어 독해 집중 훈련\n오답노트 습관화\n주 3회 자습 시간 확보"} />
+          </div>
+          <div>
+            <label className={labelClass}>학부모 메시지</label>
+            <textarea className={textareaClass} rows={2} value={data.parentMessage} onChange={(e) => update("parentMessage", e.target.value)} placeholder="학부모님께 전하는 따뜻한 메시지" />
+          </div>
+        </div>
       </section>
 
       {/* 미리보기 버튼 */}

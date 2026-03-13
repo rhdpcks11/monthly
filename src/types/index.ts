@@ -11,24 +11,20 @@ export interface ReportInput {
   wakeUpDays: number;
   totalDays: number;
   weeklyRates: [number, number, number, number];
-  // 직접 입력 필드
+  // 직접 입력 필드 (4개)
   studentFeedback: string;
-  mentorFeedback: string;
+  mentorSummary: string;
   directions: string;
   parentMessage: string;
-  summaryP1: string;
-  summaryP2: string;
-  // AI 자동생성용 (선택)
+  // AI 자동생성용
   rawText: string;
 }
 
 export interface GeneratedContent {
   student_feedback: string;
-  mentor_feedback: string;
+  mentor_summary: string;
   directions: string[];
   parent_message: string;
-  summary_p1: string;
-  summary_p2: string;
 }
 
 export interface ReportData {
@@ -45,9 +41,7 @@ export interface ReportData {
   totalDays: number;
   weeklyRates: [number, number, number, number];
   studentFeedback: string;
-  mentorFeedback: string;
+  mentorSummary: string;
   directions: string[];
   parentMessage: string;
-  summaryP1: string;
-  summaryP2: string;
 }
