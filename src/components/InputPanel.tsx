@@ -2,6 +2,7 @@
 
 import { ReportInput } from "@/types";
 import { addDays, formatDate } from "@/lib/parseDaily";
+import TimeInput from "./TimeInput";
 
 interface Props {
   data: ReportInput;
@@ -138,21 +139,17 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
                     `${i + 1}일차`
                   )}
                 </span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="06:30"
-                  className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded text-center focus:outline-none focus:ring-1 focus:ring-sky-300 bg-white"
+                <TimeInput
                   value={entry.wakeTime}
-                  onChange={(e) => updateDailyEntry(i, "wakeTime", e.target.value)}
+                  onChange={(v) => updateDailyEntry(i, "wakeTime", v)}
+                  placeholder="06:30"
+                  className="justify-center focus-within:ring-1 focus-within:ring-sky-300"
                 />
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="10:30"
-                  className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded text-center focus:outline-none focus:ring-1 focus:ring-sky-300 bg-white"
+                <TimeInput
                   value={entry.studyTime}
-                  onChange={(e) => updateDailyEntry(i, "studyTime", e.target.value)}
+                  onChange={(v) => updateDailyEntry(i, "studyTime", v)}
+                  placeholder="10:30"
+                  className="justify-center focus-within:ring-1 focus-within:ring-sky-300"
                 />
               </div>
             ))}
