@@ -4,7 +4,7 @@ import { useState } from "react";
 import InputPanel from "@/components/InputPanel";
 import ReportPreview from "@/components/ReportPreview";
 import { ReportInput, ReportData, GeneratedContent } from "@/types";
-import { parseDailyData, calcStats } from "@/lib/parseDaily";
+import { buildRecords, calcStats, createEmptyEntries } from "@/lib/parseDaily";
 
 const now = new Date();
 
@@ -16,17 +16,14 @@ const defaultInput: ReportInput = {
   mentorName: "",
   taskCompletionRate: 0,
   taskCompletionDelta: 0,
-  totalStudyHours: 0,
-  dailyAvgHours: 0,
-  wakeUpDays: 0,
-  totalDays: 30,
   weeklyRates: [0, 0, 0, 0],
   studentFeedback: "",
   mentorSummary: "",
   directions: "",
   parentMessage: "",
   rawText: "",
-  dailyDataText: "",
+  startDate: "",
+  dailyEntries: createEmptyEntries(),
 };
 
 export default function Home() {
@@ -41,7 +38,7 @@ export default function Home() {
       .map((d) => d.trim())
       .filter(Boolean);
 
-    const dailyRecords = parseDailyData(input.dailyDataText);
+    const dailyRecords = buildRecords(input.startDate, input.dailyEntries);
     const stats = calcStats(dailyRecords);
 
     setReport({
@@ -52,10 +49,6 @@ export default function Home() {
       mentorName: input.mentorName,
       taskCompletionRate: input.taskCompletionRate,
       taskCompletionDelta: input.taskCompletionDelta,
-      totalStudyHours: input.totalStudyHours,
-      dailyAvgHours: input.dailyAvgHours,
-      wakeUpDays: input.wakeUpDays,
-      totalDays: input.totalDays,
       weeklyRates: input.weeklyRates,
       studentFeedback: input.studentFeedback,
       mentorSummary: input.mentorSummary,

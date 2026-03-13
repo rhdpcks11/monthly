@@ -1,30 +1,7 @@
-import { DailyRecord } from "@/types";
-
-export function parseDailyData(text: string): DailyRecord[] {
-  const lines = text.trim().split("\n");
-  const records: DailyRecord[] = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("날짜") || trimmed.startsWith("예시")) continue;
-
-    const parts = trimmed.split(",").map((s) => s.trim());
-    if (parts.length < 4) continue;
-
-    const date = parts[0];
-    const wakeTime = parts[1];
-    const studyTime = parts[2];
-    const planRate = parseFloat(parts[3]);
-
-    if (!date.match(/\d{4}\.\d{2}\.\d{2}/) || isNaN(planRate)) continue;
-
-    records.push({ date, wakeTime, studyTime, planRate });
-  }
-
-  return records;
-}
+import { DailyEntry, DailyRecord } from "@/types";
 
 export function timeToMinutes(time: string): number {
+  if (!time || !time.includes(":")) return 0;
   const [h, m] = time.split(":").map(Number);
   return (h || 0) * 60 + (m || 0);
 }
@@ -39,6 +16,33 @@ export function minutesToHM(totalMin: number): string {
   const h = Math.floor(totalMin / 60);
   const m = Math.round(totalMin % 60);
   return `${h}H ${m}M`;
+}
+
+export function addDays(dateStr: string, days: number): Date {
+  // dateStr: "2026-02-16"
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+export function formatDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}.${m}.${day}`;
+}
+
+export function buildRecords(startDate: string, entries: DailyEntry[]): DailyRecord[] {
+  if (!startDate) return [];
+  return entries.map((entry, i) => {
+    const d = addDays(startDate, i);
+    return {
+      date: formatDate(d),
+      wakeTime: entry.wakeTime || "",
+      studyTime: entry.studyTime || "",
+      planRate: 0,
+    };
+  }).filter((r) => r.wakeTime || r.studyTime);
 }
 
 export function calcStats(records: DailyRecord[]) {
@@ -56,20 +60,20 @@ export function calcStats(records: DailyRecord[]) {
   const periodStart = records[0].date;
   const periodEnd = records[records.length - 1].date;
 
-  // 평균 기상 시간
-  const wakeMins = records.map((r) => timeToMinutes(r.wakeTime));
-  const avgWakeMin = wakeMins.reduce((a, b) => a + b, 0) / wakeMins.length;
+  const wakeRecords = records.filter((r) => r.wakeTime);
+  const wakeMins = wakeRecords.map((r) => timeToMinutes(r.wakeTime));
+  const avgWakeMin = wakeMins.length > 0 ? wakeMins.reduce((a, b) => a + b, 0) / wakeMins.length : 0;
   const avgWakeTime = minutesToHHMM(avgWakeMin);
 
-  // 평균 공부 시간
-  const studyMins = records.map((r) => timeToMinutes(r.studyTime));
-  const avgStudyMin = studyMins.reduce((a, b) => a + b, 0) / studyMins.length;
+  const studyRecords = records.filter((r) => r.studyTime);
+  const studyMins = studyRecords.map((r) => timeToMinutes(r.studyTime));
+  const avgStudyMin = studyMins.length > 0 ? studyMins.reduce((a, b) => a + b, 0) / studyMins.length : 0;
   const avgStudyTime = minutesToHM(avgStudyMin);
 
-  // 평균 계획 달성도
-  const avgPlanRate = Math.round(
-    records.reduce((a, r) => a + r.planRate, 0) / records.length
-  );
+  const planRecords = records.filter((r) => r.planRate > 0);
+  const avgPlanRate = planRecords.length > 0
+    ? Math.round(planRecords.reduce((a, r) => a + r.planRate, 0) / planRecords.length)
+    : 0;
 
   return {
     periodStart,
@@ -79,4 +83,8 @@ export function calcStats(records: DailyRecord[]) {
     avgStudyMinutes: avgStudyMin,
     avgPlanRate,
   };
+}
+
+export function createEmptyEntries(): DailyEntry[] {
+  return Array.from({ length: 28 }, () => ({ wakeTime: "", studyTime: "" }));
 }

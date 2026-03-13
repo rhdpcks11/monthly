@@ -1,6 +1,7 @@
 "use client";
 
 import { ReportInput } from "@/types";
+import { addDays, formatDate } from "@/lib/parseDaily";
 
 interface Props {
   data: ReportInput;
@@ -21,13 +22,24 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
     onChange({ ...data, weeklyRates: newRates });
   };
 
+  const updateDailyEntry = (index: number, field: "wakeTime" | "studyTime", value: string) => {
+    const newEntries = [...data.dailyEntries];
+    newEntries[index] = { ...newEntries[index], [field]: value };
+    onChange({ ...data, dailyEntries: newEntries });
+  };
+
   const inputClass =
     "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent bg-white";
   const labelClass = "block text-xs font-semibold text-gray-600 mb-1";
-  const textareaClass =
-    "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent bg-white resize-y font-mono";
 
   const canPreview = data.studentName.trim() && data.mentorName.trim();
+
+  // 날짜 라벨 계산
+  const getDateLabel = (dayIndex: number) => {
+    if (!data.startDate) return `${dayIndex + 1}일차`;
+    const d = addDays(data.startDate, dayIndex);
+    return formatDate(d);
+  };
 
   return (
     <div className="h-screen overflow-y-auto p-5 bg-gray-50 border-r border-gray-200">
@@ -83,19 +95,65 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
         </div>
       </section>
 
-      {/* 일별 데이터 */}
+      {/* 코칭 시작일 + 일별 데이터 */}
       <section className="mb-5">
         <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">일별 데이터 (28일)</h2>
-        <p className="text-xs text-gray-400 mb-2">
-          날짜, 기상시간, 공부시간, 계획달성도(%) 형식으로 붙여넣기
-        </p>
-        <textarea
-          className={textareaClass}
-          rows={10}
-          value={data.dailyDataText}
-          onChange={(e) => update("dailyDataText", e.target.value)}
-          placeholder={`2026.02.16, 06:35, 10:23, 90\n2026.02.17, 06:42, 09:32, 75\n2026.02.18, 07:10, 08:45, 80\n...`}
-        />
+        <div className="mb-3">
+          <label className={labelClass}>코칭 시작일</label>
+          <input
+            type="date"
+            className={inputClass}
+            value={data.startDate}
+            onChange={(e) => update("startDate", e.target.value)}
+          />
+          {data.startDate && (
+            <p className="text-xs text-sky-500 mt-1">
+              기간: {formatDate(addDays(data.startDate, 0))} ~ {formatDate(addDays(data.startDate, 27))}
+            </p>
+          )}
+        </div>
+
+        {/* 일별 입력 테이블 */}
+        <div className="rounded-lg border border-gray-200 overflow-hidden">
+          <div className="grid grid-cols-[1fr_1fr_1fr] bg-gray-100 text-xs font-semibold text-gray-500 py-2 px-2">
+            <span>날짜</span>
+            <span className="text-center">기상시간</span>
+            <span className="text-center">공부시간</span>
+          </div>
+          <div className="max-h-[400px] overflow-y-auto">
+            {data.dailyEntries.map((entry, i) => (
+              <div
+                key={i}
+                className={`grid grid-cols-[1fr_1fr_1fr] items-center py-1.5 px-2 ${
+                  i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                }`}
+              >
+                <span className="text-xs text-gray-500 font-medium">
+                  {data.startDate ? (
+                    <>
+                      <span className="text-gray-400 mr-1">{i + 1}.</span>
+                      {getDateLabel(i).slice(5)}
+                    </>
+                  ) : (
+                    `${i + 1}일차`
+                  )}
+                </span>
+                <input
+                  type="time"
+                  className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded text-center focus:outline-none focus:ring-1 focus:ring-sky-300 bg-white"
+                  value={entry.wakeTime}
+                  onChange={(e) => updateDailyEntry(i, "wakeTime", e.target.value)}
+                />
+                <input
+                  type="time"
+                  className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded text-center focus:outline-none focus:ring-1 focus:ring-sky-300 bg-white"
+                  value={entry.studyTime}
+                  onChange={(e) => updateDailyEntry(i, "studyTime", e.target.value)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* 이달의 수치 */}
@@ -110,26 +168,6 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
             <div>
               <label className={labelClass}>지난달 대비 (%p)</label>
               <input type="number" className={inputClass} value={data.taskCompletionDelta} onChange={(e) => update("taskCompletionDelta", Number(e.target.value))} />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>총 학습시간 (h)</label>
-              <input type="number" className={inputClass} min={0} step={0.1} value={data.totalStudyHours} onChange={(e) => update("totalStudyHours", Number(e.target.value))} />
-            </div>
-            <div>
-              <label className={labelClass}>일 평균 (h)</label>
-              <input type="number" className={inputClass} min={0} step={0.1} value={data.dailyAvgHours} onChange={(e) => update("dailyAvgHours", Number(e.target.value))} />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>기상 인증 (일)</label>
-              <input type="number" className={inputClass} min={0} value={data.wakeUpDays} onChange={(e) => update("wakeUpDays", Number(e.target.value))} />
-            </div>
-            <div>
-              <label className={labelClass}>총 일수</label>
-              <input type="number" className={inputClass} min={1} value={data.totalDays} onChange={(e) => update("totalDays", Number(e.target.value))} />
             </div>
           </div>
         </div>
@@ -154,7 +192,7 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
         <h2 className="text-sm font-bold text-gray-700 mb-3 pb-1 border-b border-gray-200">AI 자동생성 (선택)</h2>
         <p className="text-xs text-gray-400 mb-2">원문 텍스트를 붙여넣으면 아래 4개 항목이 자동 채워집니다.</p>
         <textarea
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent bg-white resize-y"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white resize-y"
           rows={6}
           value={data.rawText}
           onChange={(e) => update("rawText", e.target.value)}
