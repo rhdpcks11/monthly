@@ -16,16 +16,16 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
   const [localHH, setLocalHH] = useState("");
   const [localMM, setLocalMM] = useState("");
 
-  // 외부 value에서 표시값 계산 (포커스 안 잡혀있을 때만 외부 값 사용)
   const externalParts = value ? value.split(":") : ["", ""];
   const displayHH = focused ? localHH : externalParts[0] || "";
   const displayMM = focused ? localMM : externalParts[1] || "";
 
-  const emitChange = (h: string, m: string) => {
-    if (!h && !m) {
+  // 둘 다 값이 있을 때만 외부로 전달
+  const emitIfComplete = (h: string, m: string) => {
+    if (h && m) {
+      onChange(`${h.padStart(2, "0")}:${m.padStart(2, "0")}`);
+    } else if (!h && !m) {
       onChange("");
-    } else {
-      onChange(`${(h || "").padStart(2, "0")}:${(m || "").padStart(2, "0")}`);
     }
   };
 
@@ -47,7 +47,7 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
     const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
     setLocalHH(raw);
     if (raw.length === 2) {
-      emitChange(raw, localMM);
+      // 분 칸으로 이동만 하고, onChange는 호출하지 않음
       setTimeout(() => {
         ref2.current?.focus();
         ref2.current?.select();
@@ -59,29 +59,16 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
     const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
     setLocalMM(raw);
     if (raw.length === 2) {
-      emitChange(localHH, raw);
+      emitIfComplete(localHH, raw);
     }
   };
 
-  const handleHourBlur = () => {
-    if (localHH) {
-      emitChange(localHH, localMM);
-    }
-    // 분 칸으로 이동한 경우 focused 유지
+  const handleBlur = () => {
     setTimeout(() => {
-      if (document.activeElement !== ref2.current) {
+      // 두 입력 모두에서 포커스가 떠났을 때만 처리
+      if (document.activeElement !== ref1.current && document.activeElement !== ref2.current) {
         setFocused(false);
-      }
-    }, 0);
-  };
-
-  const handleMinBlur = () => {
-    if (localMM) {
-      emitChange(localHH, localMM);
-    }
-    setTimeout(() => {
-      if (document.activeElement !== ref1.current) {
-        setFocused(false);
+        emitIfComplete(localHH, localMM);
       }
     }, 0);
   };
@@ -114,7 +101,7 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
         value={displayHH}
         onChange={handleHourChange}
         onFocus={handleHourFocus}
-        onBlur={handleHourBlur}
+        onBlur={handleBlur}
         onKeyDown={handleHourKey}
         placeholder={phParts[0] || "00"}
         className="w-6 text-center text-xs py-1 outline-none bg-transparent"
@@ -128,7 +115,7 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
         value={displayMM}
         onChange={handleMinChange}
         onFocus={handleMinFocus}
-        onBlur={handleMinBlur}
+        onBlur={handleBlur}
         onKeyDown={handleMinKey}
         placeholder={phParts[1] || "00"}
         className="w-6 text-center text-xs py-1 outline-none bg-transparent"
