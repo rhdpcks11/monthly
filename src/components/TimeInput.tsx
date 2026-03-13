@@ -20,12 +20,12 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
   const displayHH = focused ? localHH : externalParts[0] || "";
   const displayMM = focused ? localMM : externalParts[1] || "";
 
-  // 둘 다 값이 있을 때만 외부로 전달
-  const emitIfComplete = (h: string, m: string) => {
-    if (h && m) {
-      onChange(`${h.padStart(2, "0")}:${m.padStart(2, "0")}`);
-    } else if (!h && !m) {
+  const emit = (h: string, m: string) => {
+    if (!h && !m) {
       onChange("");
+    } else {
+      // 하나라도 있으면 저장, 빈 쪽은 00으로 채움
+      onChange(`${(h || "00").padStart(2, "0")}:${(m || "00").padStart(2, "0")}`);
     }
   };
 
@@ -47,7 +47,7 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
     const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
     setLocalHH(raw);
     if (raw.length === 2) {
-      // 분 칸으로 이동만 하고, onChange는 호출하지 않음
+      emit(raw, localMM);
       setTimeout(() => {
         ref2.current?.focus();
         ref2.current?.select();
@@ -59,7 +59,7 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
     const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
     setLocalMM(raw);
     if (raw.length === 2) {
-      emitIfComplete(localHH, raw);
+      emit(localHH, raw);
     }
   };
 
@@ -68,7 +68,7 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
       // 두 입력 모두에서 포커스가 떠났을 때만 처리
       if (document.activeElement !== ref1.current && document.activeElement !== ref2.current) {
         setFocused(false);
-        emitIfComplete(localHH, localMM);
+        emit(localHH, localMM);
       }
     }, 0);
   };
