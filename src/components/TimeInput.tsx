@@ -30,16 +30,21 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
   };
 
   const handleHourFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!focused) {
+      // 외부에서 처음 진입할 때만 외부값 동기화
+      setLocalHH(externalParts[0] || "");
+      setLocalMM(externalParts[1] || "");
+    }
     setFocused(true);
-    setLocalHH(externalParts[0] || "");
-    setLocalMM(externalParts[1] || "");
     e.target.select();
   };
 
   const handleMinFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!focused) {
+      setLocalHH(externalParts[0] || "");
+      setLocalMM(externalParts[1] || "");
+    }
     setFocused(true);
-    setLocalHH(externalParts[0] || "");
-    setLocalMM(externalParts[1] || "");
     e.target.select();
   };
 
