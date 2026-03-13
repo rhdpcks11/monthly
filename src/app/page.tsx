@@ -4,6 +4,7 @@ import { useState } from "react";
 import InputPanel from "@/components/InputPanel";
 import ReportPreview from "@/components/ReportPreview";
 import { ReportInput, ReportData, GeneratedContent } from "@/types";
+import { parseDailyData, calcStats } from "@/lib/parseDaily";
 
 const now = new Date();
 
@@ -25,6 +26,7 @@ const defaultInput: ReportInput = {
   directions: "",
   parentMessage: "",
   rawText: "",
+  dailyDataText: "",
 };
 
 export default function Home() {
@@ -38,6 +40,9 @@ export default function Home() {
       .split("\n")
       .map((d) => d.trim())
       .filter(Boolean);
+
+    const dailyRecords = parseDailyData(input.dailyDataText);
+    const stats = calcStats(dailyRecords);
 
     setReport({
       studentName: input.studentName,
@@ -56,6 +61,8 @@ export default function Home() {
       mentorSummary: input.mentorSummary,
       directions,
       parentMessage: input.parentMessage,
+      dailyRecords,
+      ...stats,
     });
   };
 

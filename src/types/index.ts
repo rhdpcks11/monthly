@@ -1,3 +1,10 @@
+export interface DailyRecord {
+  date: string;       // "2026.02.16"
+  wakeTime: string;   // "06:35"
+  studyTime: string;  // "10:23"
+  planRate: number;    // 90
+}
+
 export interface ReportInput {
   studentName: string;
   year: number;
@@ -11,13 +18,12 @@ export interface ReportInput {
   wakeUpDays: number;
   totalDays: number;
   weeklyRates: [number, number, number, number];
-  // 직접 입력 필드 (4개)
   studentFeedback: string;
   mentorSummary: string;
   directions: string;
   parentMessage: string;
-  // AI 자동생성용
   rawText: string;
+  dailyDataText: string;
 }
 
 export interface GeneratedContent {
@@ -44,4 +50,12 @@ export interface ReportData {
   mentorSummary: string;
   directions: string[];
   parentMessage: string;
+  dailyRecords: DailyRecord[];
+  // 계산된 통계
+  periodStart: string;
+  periodEnd: string;
+  avgWakeTime: string;
+  avgStudyTime: string;
+  avgStudyMinutes: number;
+  avgPlanRate: number;
 }
