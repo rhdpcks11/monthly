@@ -1,7 +1,6 @@
 "use client";
 
 import { ReportData } from "@/types";
-import { useRef, useCallback, useState } from "react";
 
 interface Props {
   data: ReportData | null;
@@ -28,78 +27,9 @@ function EditableText({
 }
 
 export default function ReportPreview({ data }: Props) {
-  const reportRef = useRef<HTMLDivElement>(null);
-  const [saving, setSaving] = useState(false);
-
-  const handlePDF = useCallback(async () => {
-    if (!reportRef.current || !data) return;
-    setSaving(true);
-
-    try {
-      const el = reportRef.current;
-
-      // 편집 힌트 숨기기
-      el.classList.add("printing");
-
-      // dynamic import
-      const html2canvasModule = await import("html2canvas");
-      const html2canvas = html2canvasModule.default;
-      const jspdfModule = await import("jspdf");
-      const jsPDF = jspdfModule.jsPDF;
-
-      const canvas = await html2canvas(el, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        allowTaint: true,
-        foreignObjectRendering: false,
-      });
-
-      el.classList.remove("printing");
-
-      const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210; // A4 mm
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      if (imgHeight <= pageHeight) {
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      } else {
-        // 멀티페이지
-        let y = 0;
-        const pageCanvasH = (pageHeight * canvas.width) / imgWidth;
-        let isFirst = true;
-
-        while (y < canvas.height) {
-          const sliceH = Math.min(pageCanvasH, canvas.height - y);
-          const pageCanvas = document.createElement("canvas");
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = sliceH;
-          const ctx = pageCanvas.getContext("2d");
-          if (!ctx) break;
-          ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-
-          const pageImgH = (sliceH * imgWidth) / canvas.width;
-          if (!isFirst) pdf.addPage();
-          pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", 0, 0, imgWidth, pageImgH);
-
-          y += pageCanvasH;
-          isFirst = false;
-        }
-      }
-
-      const mm = String(data.month).padStart(2, "0");
-      pdf.save(`스카이메이트_${data.studentName}_${data.year}년${mm}월.pdf`);
-    } catch (err) {
-      console.error("PDF 생성 오류:", err);
-      alert("PDF 생성 중 오류가 발생했습니다. 콘솔을 확인해주세요.");
-    } finally {
-      setSaving(false);
-    }
-  }, [data]);
+  const handlePDF = () => {
+    window.print();
+  };
 
   if (!data) {
     return (
@@ -137,48 +67,34 @@ export default function ReportPreview({ data }: Props) {
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200 px-6 py-3 flex justify-end print-hide">
         <button
           onClick={handlePDF}
-          disabled={saving}
-          className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-lg text-sm font-semibold hover:from-sky-500 hover:to-blue-600 shadow-md hover:shadow-lg transition-all active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-lg text-sm font-semibold hover:from-sky-500 hover:to-blue-600 shadow-md hover:shadow-lg transition-all active:scale-95"
         >
-          {saving ? (
-            <>
-              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              저장 중...
-            </>
-          ) : (
-            <>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              PDF 저장
-            </>
-          )}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          PDF 저장
         </button>
       </div>
 
       {/* 레포트 영역 */}
       <div className="p-6">
         <div
-          ref={reportRef}
           id="report-content"
           className="max-w-[800px] mx-auto bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          {/* 헤더 */}
+          {/* 헤더 - 어두운 남색 그라디언트 */}
           <div
             className="px-8 py-8"
-            style={{ background: "linear-gradient(135deg, #BAE6FD 0%, #C4B5FD 50%, #DDD6FE 100%)" }}
+            style={{ background: "linear-gradient(135deg, #1E3A5F 0%, #2D4A7A 40%, #3B5998 100%)" }}
           >
             <div className="flex items-center gap-3 mb-4">
               <svg viewBox="0 0 100 100" width={40} height={40}>
                 <defs>
                   <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#ffffff" />
-                    <stop offset="100%" stopColor="#E0E7FF" />
+                    <stop offset="0%" stopColor="#7DD3FC" />
+                    <stop offset="100%" stopColor="#BAE6FD" />
                   </linearGradient>
                 </defs>
                 <polygon points="50,5 72,22 64,22 50,13 36,22 28,22" fill="url(#headerGrad)" />
@@ -189,13 +105,13 @@ export default function ReportPreview({ data }: Props) {
                 <polygon points="50,95 28,78 36,78 50,87 64,78 72,78" fill="url(#headerGrad)" />
               </svg>
               <div>
-                <h1 className="text-white text-xl font-bold tracking-wide" style={{ fontFamily: "sans-serif" }}>SKY MATE</h1>
-                <p className="text-white/80 text-xs">월간 학습코칭 레포트</p>
+                <h1 className="text-white text-xl font-bold tracking-wide">SKY MATE</h1>
+                <p className="text-sky-200 text-xs">월간 학습코칭 레포트</p>
               </div>
             </div>
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-white/70 text-xs mb-1">코칭 {data.coachingMonth}개월차</p>
+                <p className="text-sky-300 text-xs mb-1">코칭 {data.coachingMonth}개월차</p>
                 <h2 className="text-white text-2xl font-bold">{data.studentName} 학생</h2>
               </div>
               <div className="text-right">

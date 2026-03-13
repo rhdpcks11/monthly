@@ -33,18 +33,40 @@ body {
   background-color: rgba(56, 189, 248, 0.08);
 }
 
-/* PDF 출력 시 편집 힌트 숨김 */
-.printing .editable-hint {
-  background-color: transparent !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
+/* 인쇄용 스타일 */
+@media print {
+  body * {
+    visibility: hidden;
+  }
 
-.printing .editable-hint:hover {
-  background-color: transparent !important;
-}
+  #report-content,
+  #report-content * {
+    visibility: visible;
+  }
 
-/* PDF 출력 시 숨길 요소 */
-.printing .no-print {
-  display: none !important;
+  #report-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  .editable-hint {
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  @page {
+    margin: 0;
+    size: A4;
+  }
 }
