@@ -47,7 +47,6 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
     const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
     setLocalHH(raw);
     if (raw.length === 2) {
-      emit(raw, localMM);
       setTimeout(() => {
         ref2.current?.focus();
         ref2.current?.select();
