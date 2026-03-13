@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, KeyboardEvent, ChangeEvent } from "react";
+import { useRef, useState, KeyboardEvent, ChangeEvent } from "react";
 
 interface Props {
   value: string;
@@ -12,80 +12,90 @@ interface Props {
 export default function TimeInput({ value, onChange, placeholder = "00:00", className = "" }: Props) {
   const ref1 = useRef<HTMLInputElement>(null);
   const ref2 = useRef<HTMLInputElement>(null);
+  const [focused, setFocused] = useState(false);
+  const [localHH, setLocalHH] = useState("");
+  const [localMM, setLocalMM] = useState("");
 
-  // 내부에서 raw 값 관리 (패딩 없이)
-  const [rawHH, setRawHH] = useState("");
-  const [rawMM, setRawMM] = useState("");
-
-  // 외부 value가 바뀌면 동기화
-  useEffect(() => {
-    if (value) {
-      const parts = value.split(":");
-      setRawHH(parts[0] || "");
-      setRawMM(parts[1] || "");
-    } else {
-      setRawHH("");
-      setRawMM("");
-    }
-  }, [value]);
+  // 외부 value에서 표시값 계산 (포커스 안 잡혀있을 때만 외부 값 사용)
+  const externalParts = value ? value.split(":") : ["", ""];
+  const displayHH = focused ? localHH : externalParts[0] || "";
+  const displayMM = focused ? localMM : externalParts[1] || "";
 
   const emitChange = (h: string, m: string) => {
     if (!h && !m) {
       onChange("");
     } else {
-      const hPad = h ? h.padStart(2, "0") : "00";
-      const mPad = m ? m.padStart(2, "0") : "00";
-      onChange(`${hPad}:${mPad}`);
+      onChange(`${(h || "").padStart(2, "0")}:${(m || "").padStart(2, "0")}`);
     }
+  };
+
+  const handleHourFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setFocused(true);
+    setLocalHH(externalParts[0] || "");
+    setLocalMM(externalParts[1] || "");
+    e.target.select();
+  };
+
+  const handleMinFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setFocused(true);
+    setLocalHH(externalParts[0] || "");
+    setLocalMM(externalParts[1] || "");
+    e.target.select();
   };
 
   const handleHourChange = (e: ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
-    setRawHH(raw);
-    // 2자리 완성 시 분 칸으로 이동
+    setLocalHH(raw);
     if (raw.length === 2) {
-      emitChange(raw, rawMM);
-      ref2.current?.focus();
-      ref2.current?.select();
-    }
-  };
-
-  const handleHourBlur = () => {
-    // 포커스 떠날 때 패딩 적용
-    if (rawHH) {
-      const padded = rawHH.padStart(2, "0");
-      setRawHH(padded);
-      emitChange(padded, rawMM);
+      emitChange(raw, localMM);
+      setTimeout(() => {
+        ref2.current?.focus();
+        ref2.current?.select();
+      }, 0);
     }
   };
 
   const handleMinChange = (e: ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
-    setRawMM(raw);
+    setLocalMM(raw);
     if (raw.length === 2) {
-      emitChange(rawHH, raw);
+      emitChange(localHH, raw);
     }
   };
 
-  const handleMinBlur = () => {
-    if (rawMM) {
-      const padded = rawMM.padStart(2, "0");
-      setRawMM(padded);
-      emitChange(rawHH, padded);
+  const handleHourBlur = () => {
+    if (localHH) {
+      emitChange(localHH, localMM);
     }
+    // 분 칸으로 이동한 경우 focused 유지
+    setTimeout(() => {
+      if (document.activeElement !== ref2.current) {
+        setFocused(false);
+      }
+    }, 0);
+  };
+
+  const handleMinBlur = () => {
+    if (localMM) {
+      emitChange(localHH, localMM);
+    }
+    setTimeout(() => {
+      if (document.activeElement !== ref1.current) {
+        setFocused(false);
+      }
+    }, 0);
   };
 
   const handleHourKey = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === ":" || e.key === "ArrowRight") {
       e.preventDefault();
-      handleHourBlur();
       ref2.current?.focus();
       ref2.current?.select();
     }
   };
 
   const handleMinKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && rawMM === "") {
+    if (e.key === "Backspace" && localMM === "") {
       e.preventDefault();
       ref1.current?.focus();
       ref1.current?.select();
@@ -101,11 +111,11 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
         type="text"
         inputMode="numeric"
         maxLength={2}
-        value={rawHH}
+        value={displayHH}
         onChange={handleHourChange}
+        onFocus={handleHourFocus}
         onBlur={handleHourBlur}
         onKeyDown={handleHourKey}
-        onFocus={(e) => e.target.select()}
         placeholder={phParts[0] || "00"}
         className="w-6 text-center text-xs py-1 outline-none bg-transparent"
       />
@@ -115,11 +125,11 @@ export default function TimeInput({ value, onChange, placeholder = "00:00", clas
         type="text"
         inputMode="numeric"
         maxLength={2}
-        value={rawMM}
+        value={displayMM}
         onChange={handleMinChange}
+        onFocus={handleMinFocus}
         onBlur={handleMinBlur}
         onKeyDown={handleMinKey}
-        onFocus={(e) => e.target.select()}
         placeholder={phParts[1] || "00"}
         className="w-6 text-center text-xs py-1 outline-none bg-transparent"
       />
