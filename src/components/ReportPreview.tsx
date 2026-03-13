@@ -181,32 +181,17 @@ export default function ReportPreview({ data }: Props) {
                   {data.dailyRecords.map((rec, i) => (
                     <div
                       key={i}
-                      className="aspect-square rounded-lg flex flex-col items-center justify-center text-white text-xs font-bold shadow-sm"
+                      className="aspect-square rounded-lg flex flex-col items-center justify-center text-white font-bold shadow-sm"
                       style={{ backgroundColor: rec.wakeTime ? wakeColor(rec.wakeTime) : "#E2E8F0" }}
                     >
-                      <span className="text-[9px] opacity-80">{formatShortDate(rec.date)}</span>
-                      <span className="text-[11px]">{rec.wakeTime || "-"}</span>
+                      <span className="text-[11px] opacity-80">{formatShortDate(rec.date)}</span>
+                      <span className="text-sm">{rec.wakeTime || "-"}</span>
                     </div>
                   ))}
                 </div>
                 <div className="mt-3 flex items-center justify-end gap-4 text-xs text-gray-400">
                   <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: "hsl(210,80%,40%)" }} />빠른 기상</span>
                   <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: "hsl(210,80%,75%)" }} />늦은 기상</span>
-                </div>
-              </div>
-            )}
-
-            {/* ===== 페이지 나눔 ===== */}
-            {hasDaily && <div className="page-break-point" />}
-            {hasDaily && (
-              <div className="page2-header">
-                <div className="report-section px-6 py-3 flex items-center justify-between rounded-xl" style={{ background: "linear-gradient(135deg, #1E3A5F 0%, #2D4A7A 40%, #3B5998 100%)" }}>
-                  <div className="flex items-center gap-2">
-                    <LogoSVG id="miniGrad" size={20} colors={["#7DD3FC", "#BAE6FD"]} />
-                    <span className="text-white text-sm font-bold">{data.studentName} 학생</span>
-                    <span className="text-sky-300 text-xs">| {data.year}년 {data.month}월</span>
-                  </div>
-                  <span className="text-sky-200 text-xs">{data.periodStart} ~ {data.periodEnd}</span>
                 </div>
               </div>
             )}

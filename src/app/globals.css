@@ -32,29 +32,16 @@ body {
   background-color: rgba(56, 189, 248, 0.08);
 }
 
-/* 2페이지 미니 헤더: 화면에서는 숨기고 인쇄에서만 보임 */
-.page2-header {
-  display: none;
-}
-
-/* 페이지 나눔 포인트: 화면에서는 보이지 않음 */
-.page-break-point {
-  display: none;
-}
-
 /* ===== 인쇄 스타일 ===== */
 @media print {
   @page {
-    margin: 8mm;
-    size: A4;
+    margin: 0;
   }
 
-  /* 전체 숨기기 */
   body * {
     visibility: hidden;
   }
 
-  /* 레포트만 표시 */
   #report-content,
   #report-content * {
     visibility: visible;
@@ -80,69 +67,6 @@ body {
     background-color: transparent !important;
     outline: none !important;
     box-shadow: none !important;
-  }
-
-  /* 섹션 잘림 방지 */
-  .report-section {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  /* 페이지 나눔 포인트 */
-  .page-break-point {
-    display: block;
-    break-before: page;
-    page-break-before: always;
-    height: 0;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* 2페이지 미니 헤더 표시 */
-  .page2-header {
-    display: block;
-    margin: 0 -2rem;
-    margin-bottom: 1rem;
-  }
-
-  /* 인쇄 시 크기 축소 (85~90%) */
-  #report-content {
-    font-size: 88%;
-  }
-
-  #report-content .px-8 {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-  }
-
-  #report-content .py-6 {
-    padding-top: 1rem !important;
-    padding-bottom: 1rem !important;
-  }
-
-  #report-content .py-8 {
-    padding-top: 1.25rem !important;
-    padding-bottom: 1.25rem !important;
-  }
-
-  #report-content .space-y-6 > * + * {
-    margin-top: 1rem !important;
-  }
-
-  #report-content .p-5 {
-    padding: 0.875rem !important;
-  }
-
-  #report-content .p-4 {
-    padding: 0.75rem !important;
-  }
-
-  #report-content .mb-4 {
-    margin-bottom: 0.75rem !important;
-  }
-
-  #report-content .gap-4 {
-    gap: 0.75rem !important;
   }
 
   /* 배경색 인쇄 보장 */

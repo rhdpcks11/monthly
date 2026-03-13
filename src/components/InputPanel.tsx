@@ -139,13 +139,17 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
                   )}
                 </span>
                 <input
-                  type="time"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="06:30"
                   className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded text-center focus:outline-none focus:ring-1 focus:ring-sky-300 bg-white"
                   value={entry.wakeTime}
                   onChange={(e) => updateDailyEntry(i, "wakeTime", e.target.value)}
                 />
                 <input
-                  type="time"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="10:30"
                   className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded text-center focus:outline-none focus:ring-1 focus:ring-sky-300 bg-white"
                   value={entry.studyTime}
                   onChange={(e) => updateDailyEntry(i, "studyTime", e.target.value)}
