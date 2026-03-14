@@ -196,39 +196,73 @@ export default function ReportPreview({ data }: Props) {
               </div>
             )}
 
-            {/* ===== 공부 시간 막대 차트 ===== */}
-            {hasDaily && (
-              <div className="report-section bg-violet-50/50 rounded-xl p-5 border border-violet-100 overflow-hidden">
-                <h3 className="text-sm font-bold text-gray-700 mb-4">일별 공부 시간</h3>
-                <div className="w-full overflow-hidden" style={{ height: "200px" }}>
-                  <div className="flex items-end h-full" style={{ gap: "1px" }}>
-                    {data.dailyRecords.map((rec, i) => {
-                      const mins = studyMins[i];
-                      const pct = (mins / maxStudy) * 100;
-                      const isAboveAvg = mins >= data.avgStudyMinutes;
-                      return (
-                        <div key={i} className="flex flex-col items-center justify-end h-full overflow-hidden" style={{ flex: "1 1 0%", minWidth: 0, maxWidth: `${100 / 28}%` }}>
-                          <span className="text-[5px] text-gray-500 leading-none truncate w-full text-center">{minutesToHM(mins)}</span>
-                          <div
-                            className="rounded-t-sm min-h-[2px] mx-auto"
-                            style={{
-                              width: "90%",
-                              height: `${pct}%`,
-                              backgroundColor: isAboveAvg ? "#7C3AED" : "#C4B5FD",
-                            }}
-                          />
-                          <span className="text-[5px] text-gray-400 leading-none truncate w-full text-center">{formatShortDate(rec.date)}</span>
-                        </div>
-                      );
-                    })}
+            {/* ===== 공부 시간 꺾은선 차트 ===== */}
+            {hasDaily && (() => {
+              const chartW = 700;
+              const chartH = 160;
+              const padL = 40;
+              const padR = 10;
+              const padT = 20;
+              const padB = 30;
+              const innerW = chartW - padL - padR;
+              const innerH = chartH - padT - padB;
+              const n = data.dailyRecords.length;
+              const avgPct = data.avgStudyMinutes / maxStudy;
+              const avgY = padT + innerH * (1 - avgPct);
+              const points = data.dailyRecords.map((rec, i) => {
+                const x = padL + (i / (n - 1)) * innerW;
+                const y = padT + innerH * (1 - studyMins[i] / maxStudy);
+                return { x, y, mins: studyMins[i], date: formatShortDate(rec.date) };
+              });
+              const polyline = points.map(p => `${p.x},${p.y}`).join(" ");
+              const areaPath = `M${points[0].x},${padT + innerH} ${points.map(p => `L${p.x},${p.y}`).join(" ")} L${points[n - 1].x},${padT + innerH} Z`;
+              // Y축 눈금 (0, 25%, 50%, 75%, 100%)
+              const yTicks = [0, 0.25, 0.5, 0.75, 1].map(r => ({
+                y: padT + innerH * (1 - r),
+                label: minutesToHM(Math.round(maxStudy * r)),
+              }));
+              return (
+                <div className="report-section bg-violet-50/50 rounded-xl p-5 border border-violet-100">
+                  <h3 className="text-sm font-bold text-gray-700 mb-4">일별 공부 시간</h3>
+                  <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" preserveAspectRatio="xMidYMid meet">
+                    {/* Y축 가이드라인 */}
+                    {yTicks.map((t, i) => (
+                      <g key={i}>
+                        <line x1={padL} y1={t.y} x2={chartW - padR} y2={t.y} stroke="#e5e7eb" strokeWidth="0.5" />
+                        <text x={padL - 4} y={t.y + 1} textAnchor="end" fontSize="7" fill="#9ca3af">{t.label}</text>
+                      </g>
+                    ))}
+                    {/* 평균선 */}
+                    <line x1={padL} y1={avgY} x2={chartW - padR} y2={avgY} stroke="#7C3AED" strokeWidth="0.8" strokeDasharray="4 2" opacity="0.5" />
+                    <text x={chartW - padR + 2} y={avgY + 3} fontSize="6" fill="#7C3AED">평균</text>
+                    {/* 영역 채우기 */}
+                    <path d={areaPath} fill="url(#studyGrad)" opacity="0.3" />
+                    <defs>
+                      <linearGradient id="studyGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#7C3AED" />
+                        <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    {/* 꺾은선 */}
+                    <polyline points={polyline} fill="none" stroke="#7C3AED" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+                    {/* 점 */}
+                    {points.map((p, i) => (
+                      <circle key={i} cx={p.x} cy={p.y} r="2" fill={p.mins >= data.avgStudyMinutes ? "#7C3AED" : "#C4B5FD"} stroke="white" strokeWidth="0.5" />
+                    ))}
+                    {/* X축 날짜 라벨 */}
+                    {points.map((p, i) => (
+                      i % Math.ceil(n / 14) === 0 || i === n - 1 ? (
+                        <text key={i} x={p.x} y={padT + innerH + 12} textAnchor="middle" fontSize="6" fill="#9ca3af">{p.date}</text>
+                      ) : null
+                    ))}
+                  </svg>
+                  <div className="mt-2 flex items-center justify-end gap-4 text-xs text-gray-400">
+                    <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#7C3AED" }} />평균 이상</span>
+                    <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#C4B5FD" }} />평균 이하</span>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center justify-end gap-4 text-xs text-gray-400">
-                  <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: "#7C3AED" }} />평균 이상</span>
-                  <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: "#C4B5FD" }} />평균 이하</span>
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* ===== 학생 자기 피드백 ===== */}
             {data.studentFeedback && (
