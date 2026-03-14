@@ -198,27 +198,29 @@ export default function ReportPreview({ data }: Props) {
 
             {/* ===== 공부 시간 막대 차트 ===== */}
             {hasDaily && (
-              <div className="report-section bg-violet-50/50 rounded-xl p-5 border border-violet-100">
+              <div className="report-section bg-violet-50/50 rounded-xl p-5 border border-violet-100 overflow-hidden">
                 <h3 className="text-sm font-bold text-gray-700 mb-4">일별 공부 시간</h3>
-                <div className="flex items-end gap-[1px] overflow-hidden" style={{ height: "200px" }}>
-                  {data.dailyRecords.map((rec, i) => {
-                    const mins = studyMins[i];
-                    const pct = (mins / maxStudy) * 100;
-                    const isAboveAvg = mins >= data.avgStudyMinutes;
-                    return (
-                      <div key={i} className="flex-1 min-w-0 flex flex-col items-center justify-end h-full">
-                        <span className="text-[6px] text-gray-500 mb-0.5 leading-none truncate w-full text-center">{minutesToHM(mins)}</span>
-                        <div
-                          className="w-full rounded-t-sm min-h-[2px]"
-                          style={{
-                            height: `${pct}%`,
-                            backgroundColor: isAboveAvg ? "#7C3AED" : "#C4B5FD",
-                          }}
-                        />
-                        <span className="text-[6px] text-gray-400 mt-0.5 leading-none truncate w-full text-center">{formatShortDate(rec.date)}</span>
-                      </div>
-                    );
-                  })}
+                <div className="w-full overflow-hidden" style={{ height: "200px" }}>
+                  <div className="flex items-end h-full" style={{ gap: "1px" }}>
+                    {data.dailyRecords.map((rec, i) => {
+                      const mins = studyMins[i];
+                      const pct = (mins / maxStudy) * 100;
+                      const isAboveAvg = mins >= data.avgStudyMinutes;
+                      return (
+                        <div key={i} className="flex flex-col items-center justify-end h-full overflow-hidden" style={{ flex: "1 1 0%", minWidth: 0, maxWidth: `${100 / 28}%` }}>
+                          <span className="text-[5px] text-gray-500 leading-none truncate w-full text-center">{minutesToHM(mins)}</span>
+                          <div
+                            className="w-full rounded-t-sm min-h-[2px]"
+                            style={{
+                              height: `${pct}%`,
+                              backgroundColor: isAboveAvg ? "#7C3AED" : "#C4B5FD",
+                            }}
+                          />
+                          <span className="text-[5px] text-gray-400 leading-none truncate w-full text-center">{formatShortDate(rec.date)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="mt-3 flex items-center justify-end gap-4 text-xs text-gray-400">
                   <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: "#7C3AED" }} />평균 이상</span>
