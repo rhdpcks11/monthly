@@ -210,7 +210,8 @@ export default function ReportPreview({ data }: Props) {
                         <div key={i} className="flex flex-col items-center justify-end h-full overflow-hidden" style={{ flex: "1 1 0%", minWidth: 0, maxWidth: `${100 / 28}%` }}>
                           <span className="text-[5px] text-gray-500 leading-none truncate w-full text-center">{minutesToHM(mins)}</span>
                           <div
-                            className="w-full rounded-t-sm min-h-[2px]"
+                            className="rounded-t-sm min-h-[2px] mx-auto"
+                            style={{ width: "90%" }}
                             style={{
                               height: `${pct}%`,
                               backgroundColor: isAboveAvg ? "#7C3AED" : "#C4B5FD",
