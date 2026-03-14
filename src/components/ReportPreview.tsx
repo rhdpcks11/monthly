@@ -211,8 +211,8 @@ export default function ReportPreview({ data }: Props) {
                           <span className="text-[5px] text-gray-500 leading-none truncate w-full text-center">{minutesToHM(mins)}</span>
                           <div
                             className="rounded-t-sm min-h-[2px] mx-auto"
-                            style={{ width: "90%" }}
                             style={{
+                              width: "90%",
                               height: `${pct}%`,
                               backgroundColor: isAboveAvg ? "#7C3AED" : "#C4B5FD",
                             }}
