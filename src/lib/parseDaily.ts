@@ -38,11 +38,13 @@ export function buildRecords(startDate: string, entries: DailyEntry[]): DailyRec
     const d = addDays(startDate, i);
     return {
       date: formatDate(d),
-      wakeTime: entry.wakeTime || "",
-      studyTime: entry.studyTime || "",
+      wakeTime: entry.wakeNotSubmitted ? "" : (entry.wakeTime || ""),
+      studyTime: entry.studyNotSubmitted ? "" : (entry.studyTime || ""),
       planRate: 0,
+      wakeNotSubmitted: entry.wakeNotSubmitted || false,
+      studyNotSubmitted: entry.studyNotSubmitted || false,
     };
-  }).filter((r) => r.wakeTime || r.studyTime);
+  }).filter((r) => r.wakeTime || r.studyTime || r.wakeNotSubmitted || r.studyNotSubmitted);
 }
 
 export function calcStats(records: DailyRecord[]) {
@@ -60,12 +62,12 @@ export function calcStats(records: DailyRecord[]) {
   const periodStart = records[0].date;
   const periodEnd = records[records.length - 1].date;
 
-  const wakeRecords = records.filter((r) => r.wakeTime);
+  const wakeRecords = records.filter((r) => r.wakeTime && !r.wakeNotSubmitted);
   const wakeMins = wakeRecords.map((r) => timeToMinutes(r.wakeTime));
   const avgWakeMin = wakeMins.length > 0 ? wakeMins.reduce((a, b) => a + b, 0) / wakeMins.length : 0;
   const avgWakeTime = minutesToHHMM(avgWakeMin);
 
-  const studyRecords = records.filter((r) => r.studyTime);
+  const studyRecords = records.filter((r) => r.studyTime && !r.studyNotSubmitted);
   const studyMins = studyRecords.map((r) => timeToMinutes(r.studyTime));
   const avgStudyMin = studyMins.length > 0 ? studyMins.reduce((a, b) => a + b, 0) / studyMins.length : 0;
   const avgStudyTime = minutesToHM(avgStudyMin);
@@ -86,5 +88,5 @@ export function calcStats(records: DailyRecord[]) {
 }
 
 export function createEmptyEntries(): DailyEntry[] {
-  return Array.from({ length: 28 }, () => ({ wakeTime: "", studyTime: "" }));
+  return Array.from({ length: 28 }, () => ({ wakeTime: "", studyTime: "", wakeNotSubmitted: false, studyNotSubmitted: false }));
 }

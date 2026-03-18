@@ -70,8 +70,9 @@ export default function ReportPreview({ data }: Props) {
   const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, "0")}.${String(today.getDate()).padStart(2, "0")}`;
 
   const hasDaily = data.dailyRecords.length > 0;
-  const studyMins = data.dailyRecords.map((r) => timeToMinutes(r.studyTime));
-  const maxStudy = Math.max(...studyMins, 1);
+  const studyMins = data.dailyRecords.map((r) => r.studyNotSubmitted ? 0 : timeToMinutes(r.studyTime));
+  const validStudyMins = data.dailyRecords.filter((r) => !r.studyNotSubmitted).map((r) => timeToMinutes(r.studyTime));
+  const maxStudy = Math.max(...(validStudyMins.length > 0 ? validStudyMins : [1]), 1);
 
   let startDayOfWeek = 0;
   if (hasDaily) {
@@ -182,16 +183,21 @@ export default function ReportPreview({ data }: Props) {
                     <div
                       key={i}
                       className="aspect-square rounded-lg flex flex-col items-center justify-center text-white font-bold shadow-sm"
-                      style={{ backgroundColor: rec.wakeTime ? wakeColor(rec.wakeTime) : "#E2E8F0" }}
+                      style={{ backgroundColor: rec.wakeNotSubmitted ? "#F87171" : rec.wakeTime ? wakeColor(rec.wakeTime) : "#E2E8F0" }}
                     >
                       <span className="text-[11px] opacity-80">{formatShortDate(rec.date)}</span>
-                      <span className="text-sm">{rec.wakeTime || "-"}</span>
+                      {rec.wakeNotSubmitted ? (
+                        <span className="text-[10px] font-semibold">미제출</span>
+                      ) : (
+                        <span className="text-sm">{rec.wakeTime || "-"}</span>
+                      )}
                     </div>
                   ))}
                 </div>
                 <div className="mt-3 flex items-center justify-end gap-4 text-xs text-gray-400">
                   <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: "hsl(210,80%,40%)" }} />빠른 기상</span>
                   <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: "hsl(210,80%,75%)" }} />늦은 기상</span>
+                  <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: "#F87171" }} />미제출</span>
                 </div>
               </div>
             )}
@@ -247,7 +253,14 @@ export default function ReportPreview({ data }: Props) {
                     <polyline points={polyline} fill="none" stroke="#7C3AED" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
                     {/* 점 */}
                     {points.map((p, i) => (
-                      <circle key={i} cx={p.x} cy={p.y} r="2" fill={p.mins >= data.avgStudyMinutes ? "#7C3AED" : "#C4B5FD"} stroke="white" strokeWidth="0.5" />
+                      data.dailyRecords[i]?.studyNotSubmitted ? (
+                        <g key={i}>
+                          <circle cx={p.x} cy={padT + innerH} r="3" fill="#F87171" stroke="white" strokeWidth="0.5" />
+                          <text x={p.x} y={padT + innerH + 1} textAnchor="middle" fontSize="4" fill="white" fontWeight="bold">X</text>
+                        </g>
+                      ) : (
+                        <circle key={i} cx={p.x} cy={p.y} r="2" fill={p.mins >= data.avgStudyMinutes ? "#7C3AED" : "#C4B5FD"} stroke="white" strokeWidth="0.5" />
+                      )
                     ))}
                     {/* X축 날짜 라벨 */}
                     {points.map((p, i) => (
@@ -259,6 +272,7 @@ export default function ReportPreview({ data }: Props) {
                   <div className="mt-2 flex items-center justify-end gap-4 text-xs text-gray-400">
                     <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#7C3AED" }} />평균 이상</span>
                     <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#C4B5FD" }} />평균 이하</span>
+                    <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#F87171" }} />미제출</span>
                   </div>
                 </div>
               );

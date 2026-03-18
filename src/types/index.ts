@@ -1,6 +1,8 @@
 export interface DailyEntry {
   wakeTime: string;   // "06:35"
   studyTime: string;  // "10:23"
+  wakeNotSubmitted?: boolean;
+  studyNotSubmitted?: boolean;
 }
 
 export interface DailyRecord {
@@ -8,6 +10,8 @@ export interface DailyRecord {
   wakeTime: string;
   studyTime: string;
   planRate: number;
+  wakeNotSubmitted?: boolean;
+  studyNotSubmitted?: boolean;
 }
 
 export interface ReportInput {

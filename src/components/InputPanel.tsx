@@ -29,6 +29,18 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
     onChange({ ...data, dailyEntries: newEntries });
   };
 
+  const toggleNotSubmitted = (index: number, field: "wakeNotSubmitted" | "studyNotSubmitted") => {
+    const newEntries = [...data.dailyEntries];
+    const current = newEntries[index][field] || false;
+    newEntries[index] = { ...newEntries[index], [field]: !current };
+    if (!current) {
+      // 미제출 체크 시 시간 초기화
+      const timeField = field === "wakeNotSubmitted" ? "wakeTime" : "studyTime";
+      newEntries[index] = { ...newEntries[index], [timeField]: "" };
+    }
+    onChange({ ...data, dailyEntries: newEntries });
+  };
+
   const inputClass =
     "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent bg-white";
   const labelClass = "block text-xs font-semibold text-gray-600 mb-1";
@@ -116,16 +128,18 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
 
         {/* 일별 입력 테이블 */}
         <div className="rounded-lg border border-gray-200 overflow-hidden">
-          <div className="grid grid-cols-[1fr_1fr_1fr] bg-gray-100 text-xs font-semibold text-gray-500 py-2 px-2">
+          <div className="grid grid-cols-[56px_1fr_20px_1fr_20px] bg-gray-100 text-xs font-semibold text-gray-500 py-2 px-2">
             <span>날짜</span>
             <span className="text-center">기상시간</span>
+            <span title="미제출" className="text-center text-[9px] text-gray-400">X</span>
             <span className="text-center">공부시간</span>
+            <span title="미제출" className="text-center text-[9px] text-gray-400">X</span>
           </div>
           <div className="max-h-[400px] overflow-y-auto">
             {data.dailyEntries.map((entry, i) => (
               <div
                 key={i}
-                className={`grid grid-cols-[1fr_1fr_1fr] items-center py-1.5 px-2 ${
+                className={`grid grid-cols-[56px_1fr_20px_1fr_20px] items-center py-1.5 px-2 ${
                   i % 2 === 0 ? "bg-white" : "bg-gray-50"
                 }`}
               >
@@ -143,14 +157,30 @@ export default function InputPanel({ data, onChange, onGenerate, onPreview, load
                   value={entry.wakeTime}
                   onChange={(v) => updateDailyEntry(i, "wakeTime", v)}
                   placeholder="06:30"
-                  className="justify-center focus-within:ring-1 focus-within:ring-sky-300"
+                  className={`justify-center focus-within:ring-1 focus-within:ring-sky-300 ${entry.wakeNotSubmitted ? "opacity-30 pointer-events-none" : ""}`}
                 />
+                <label className="flex items-center justify-center cursor-pointer" title="미제출">
+                  <input
+                    type="checkbox"
+                    checked={entry.wakeNotSubmitted || false}
+                    onChange={() => toggleNotSubmitted(i, "wakeNotSubmitted")}
+                    className="w-3 h-3 accent-red-400 cursor-pointer"
+                  />
+                </label>
                 <TimeInput
                   value={entry.studyTime}
                   onChange={(v) => updateDailyEntry(i, "studyTime", v)}
                   placeholder="10:30"
-                  className="justify-center focus-within:ring-1 focus-within:ring-sky-300"
+                  className={`justify-center focus-within:ring-1 focus-within:ring-sky-300 ${entry.studyNotSubmitted ? "opacity-30 pointer-events-none" : ""}`}
                 />
+                <label className="flex items-center justify-center cursor-pointer" title="미제출">
+                  <input
+                    type="checkbox"
+                    checked={entry.studyNotSubmitted || false}
+                    onChange={() => toggleNotSubmitted(i, "studyNotSubmitted")}
+                    className="w-3 h-3 accent-red-400 cursor-pointer"
+                  />
+                </label>
               </div>
             ))}
           </div>
