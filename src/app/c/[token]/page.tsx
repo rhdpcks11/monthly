@@ -28,7 +28,12 @@ export default function ConsultingFormPage({ params }: { params: Promise<{ token
 
   useEffect(() => {
     let alive = true;
-    fetch(`/api/consulting/${token}`)
+    // ?form=pre|weekly|monthly 직접 링크 — 서버에도 그대로 넘겨야 지정한 폼이 나온다.
+    // (안 넘기면 주차로 계산한 폼이 떠서, 사전 질문지 링크가 주간/월간 폼으로 보였다)
+    const forced = new URLSearchParams(window.location.search).get("form");
+    const qs =
+      forced === "pre" || forced === "weekly" || forced === "monthly" ? `?form=${forced}` : "";
+    fetch(`/api/consulting/${token}${qs}`)
       .then(async (r) => {
         if (!r.ok) return { state: "invalid" as const };
         const d = await r.json();

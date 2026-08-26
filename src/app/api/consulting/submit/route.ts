@@ -16,18 +16,25 @@ export async function POST(req: Request) {
 
   const state = weekStateForStudent(student.coachingStartDate);
 
-  // 폼 종류 결정: ?form=pre 직접 링크면 사전 질문지(주차 무시), 아니면 서버가 주차로 재계산.
-  const forcedPre = body.form === "pre";
+  // 폼 종류 결정 — 주차는 항상 서버가 계산한다 (클라이언트 값 신뢰 안 함).
+  // 폼 종류는 ?form=... 직접 링크로 지정할 수 있어야 한다. 학생이 실제로 작성한 폼과
+  // 서버가 검증하는 항목이 어긋나면 제출 자체가 막히기 때문.
+  const forced =
+    body.form === "pre" || body.form === "weekly" || body.form === "monthly"
+      ? (body.form as "pre" | "weekly" | "monthly")
+      : null;
   let formType: "weekly" | "monthly" | "pre";
   let weekNumber: number;
-  if (forcedPre) {
+  if (forced === "pre") {
+    // 사전 질문지는 가입 직후 1회만 받는 폼이라, 언제 제출하든 항상 1주차에 모은다.
+    // (예전에는 제출 시점의 주차로 태깅돼 5주차·9주차 등에 흩어졌다)
     formType = "pre";
-    weekNumber = state.kind === "form" ? state.week : 1;
+    weekNumber = 1;
   } else {
     if (state.kind !== "form") {
       return NextResponse.json({ error: "지금은 제출할 수 있는 폼이 없습니다." }, { status: 400 });
     }
-    formType = state.formType;
+    formType = forced ?? state.formType;
     weekNumber = state.week;
   }
 
